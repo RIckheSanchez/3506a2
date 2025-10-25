@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.PriorityQueue;
 
 // This is part of COMP3506 Assignment 2. Students must implement their own solutions.
 
@@ -236,7 +237,93 @@ public class Problems {
     public static <S, U> List<Entry<Integer, Integer>> routeManagement(List<Edge<S, U>> edgeList,
                                                           Vertex<S> origin, int threshold) {
         ArrayList<Entry<Integer, Integer>> answers = new ArrayList<>();
+        
+        if (edgeList == null || origin == null) {
+            return answers;
+        }
+        
+        int originId = origin.getId();
+        
+        HashMap<Integer, ArrayList<EdgeInfo>> graph = new HashMap<>();
+        
+        for (Edge<S, U> edge : edgeList) {
+            int v1 = edge.getVertex1().getId();
+            int v2 = edge.getVertex2().getId();
+            int weight = (Integer) edge.getData();
+            
+            graph.putIfAbsent(v1, new ArrayList<>());
+            graph.putIfAbsent(v2, new ArrayList<>());
+            
+            graph.get(v1).add(new EdgeInfo(v2, weight));
+            graph.get(v2).add(new EdgeInfo(v1, weight));
+        }
+        
+        HashMap<Integer, Integer> distances = new HashMap<>();
+        distances.put(originId, 0);
+        
+        PriorityQueue<NodeDist> pq = new PriorityQueue<>((a, b) -> Integer.compare(a.dist, b.dist));
+        pq.offer(new NodeDist(originId, 0));
+        
+        HashSet<Integer> visited = new HashSet<>();
+        
+        while (!pq.isEmpty()) {
+            NodeDist current = pq.poll();
+            int nodeId = current.nodeId;
+            int dist = current.dist;
+            
+            if (visited.contains(nodeId)) {
+                continue;
+            }
+            
+            visited.add(nodeId);
+            
+            if (dist > threshold) {
+                continue;
+            }
+            
+            if (!graph.containsKey(nodeId)) {
+                continue;
+            }
+            
+            for (EdgeInfo neighbor : graph.get(nodeId)) {
+                int neighborId = neighbor.targetId;
+                int edgeWeight = neighbor.weight;
+                int newDist = dist + edgeWeight;
+                
+                if (newDist <= threshold) {
+                    if (!distances.containsKey(neighborId) || newDist < distances.get(neighborId)) {
+                        distances.put(neighborId, newDist);
+                        pq.offer(new NodeDist(neighborId, newDist));
+                    }
+                }
+            }
+        }
+        
+        for (HashMap.Entry<Integer, Integer> entry : distances.entrySet()) {
+            answers.add(new Entry<>(entry.getKey(), entry.getValue()));
+        }
+        
         return answers;
+    }
+    
+    private static class NodeDist {
+        int nodeId;
+        int dist;
+        
+        NodeDist(int nodeId, int dist) {
+            this.nodeId = nodeId;
+            this.dist = dist;
+        }
+    }
+    
+    private static class EdgeInfo {
+        int targetId;
+        int weight;
+        
+        EdgeInfo(int targetId, int weight) {
+            this.targetId = targetId;
+            this.weight = weight;
+        }
     }
 
     /**
@@ -251,7 +338,45 @@ public class Problems {
      * range [0, n-1] for n unique tunnels.
      */
     public static int totallyFlooded(List<Tunnel> tunnels) {
-        return -1;
+        if (tunnels == null || tunnels.isEmpty()) {
+            return -1;
+        }
+        
+        int n = tunnels.size();
+        double epsilon = 0.000001;
+        
+        int maxFlooded = -1;
+        int resultId = -1;
+        
+        for (int i = 0; i < n; i++) {
+            Tunnel source = tunnels.get(i);
+            int floodCount = 0;
+            
+            for (int j = 0; j < n; j++) {
+                if (i == j) {
+                    continue;
+                }
+                
+                Tunnel target = tunnels.get(j);
+                
+                double dx = source.getX() - target.getX();
+                double dy = source.getY() - target.getY();
+                double distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < source.getRadius() + epsilon) {
+                    floodCount++;
+                }
+            }
+            
+            if (floodCount > maxFlooded) {
+                maxFlooded = floodCount;
+                resultId = source.getId();
+            } else if (floodCount == maxFlooded && (resultId == -1 || source.getId() < resultId)) {
+                resultId = source.getId();
+            }
+        }
+        
+        return resultId;
     }
 
     /**
@@ -268,6 +393,44 @@ public class Problems {
      */
     public static int susDomination(List<Integer> sites, List<List<List<Integer>>> rules,
                                      List<Integer> startingSites) {
-        return -1;
+        if (sites == null || sites.isEmpty()) {
+            return 0;
+        }
+        
+        HashSet<Integer> infiltrated = new HashSet<>();
+        
+        if (startingSites != null) {
+            infiltrated.addAll(startingSites);
+        }
+        
+        for (Integer site : sites) {
+            if (infiltrated.contains(site)) {
+                continue;
+            }
+            
+            if (site >= rules.size() || rules.get(site) == null) {
+                continue;
+            }
+            
+            List<List<Integer>> siteRules = rules.get(site);
+            
+            for (List<Integer> rule : siteRules) {
+                boolean canInfiltrate = true;
+                
+                for (Integer required : rule) {
+                    if (!infiltrated.contains(required)) {
+                        canInfiltrate = false;
+                        break;
+                    }
+                }
+                
+                if (canInfiltrate) {
+                    infiltrated.add(site);
+                    break;
+                }
+            }
+        }
+        
+        return sites.size() - infiltrated.size();
     }
 }
