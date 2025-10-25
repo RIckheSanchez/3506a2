@@ -1,0 +1,10 @@
+Submission counter: 0 << Keep track of your submission counts
+
+Student ID:49174058
+
+Statement
+---------
+
+Refer to the referencing guide on the LMS for details on what needs to go in
+here. If in doubt, put your references here. Ignorance is NOT an excuse for
+skipping this process.
