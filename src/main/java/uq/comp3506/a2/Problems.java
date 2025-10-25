@@ -10,6 +10,8 @@ import uq.comp3506.a2.structures.TopologyType;
 import uq.comp3506.a2.structures.Tunnel;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 // This is part of COMP3506 Assignment 2. Students must implement their own solutions.
@@ -36,7 +38,48 @@ public class Problems {
      * Note: We promise that the input List will be an ArrayList.
      */
     public static double tunnelLighting(int tunnelLength, List<Integer> lightIntervals) {
-        return -1;
+        if (lightIntervals == null || lightIntervals.isEmpty()) {
+            return -1;
+        }
+        
+        ArrayList<Integer> positions = new ArrayList<>(lightIntervals);
+        positions.sort(Integer::compareTo);
+        
+        double left = 0.0;
+        double right = (double) tunnelLength;
+        double epsilon = 0.000001;
+        
+        while (right - left > epsilon) {
+            double mid = (left + right) / 2;
+            if (canCover(tunnelLength, positions, mid)) {
+                right = mid;
+            } else {
+                left = mid;
+            }
+        }
+        
+        return right;
+    }
+    
+    private static boolean canCover(int tunnelLength, List<Integer> positions, double radius) {
+        double covered = 0.0;
+        int i = 0;
+        
+        while (covered < tunnelLength && i < positions.size()) {
+            if (positions.get(i) - radius > covered) {
+                return false;
+            }
+            
+            double maxReach = covered;
+            while (i < positions.size() && positions.get(i) - radius <= covered) {
+                maxReach = Math.max(maxReach, positions.get(i) + radius);
+                i++;
+            }
+            
+            covered = maxReach;
+        }
+        
+        return covered >= tunnelLength;
     }
 
     /**
@@ -49,8 +92,131 @@ public class Problems {
      * vertices.
      */
     public static <S, U> TopologyType topologyDetection(List<Edge<S, U>> edgeList) {
-        TopologyType dummy = TopologyType.UNKNOWN;
-        return dummy;
+        if (edgeList == null || edgeList.isEmpty()) {
+            return TopologyType.UNKNOWN;
+        }
+        
+        HashMap<Integer, ArrayList<Integer>> graph = new HashMap<>();
+        HashSet<Integer> vertices = new HashSet<>();
+        
+        for (Edge<S, U> edge : edgeList) {
+            int v1 = edge.getVertex1().getId();
+            int v2 = edge.getVertex2().getId();
+            vertices.add(v1);
+            vertices.add(v2);
+            
+            graph.putIfAbsent(v1, new ArrayList<>());
+            graph.putIfAbsent(v2, new ArrayList<>());
+            graph.get(v1).add(v2);
+            graph.get(v2).add(v1);
+        }
+        
+        HashSet<Integer> visited = new HashSet<>();
+        ArrayList<HashSet<Integer>> components = new ArrayList<>();
+        
+        for (Integer vertex : vertices) {
+            if (!visited.contains(vertex)) {
+                HashSet<Integer> component = new HashSet<>();
+                dfsExplore(vertex, graph, visited, component);
+                components.add(component);
+            }
+        }
+        
+        boolean isConnected = components.size() == 1;
+        
+        if (isConnected) {
+            boolean hasCycle = detectCycle(graph, vertices.iterator().next());
+            return hasCycle ? TopologyType.CONNECTED_GRAPH : TopologyType.CONNECTED_TREE;
+        } else {
+            boolean hasTree = false;
+            boolean hasGraph = false;
+            
+            for (HashSet<Integer> component : components) {
+                Integer start = component.iterator().next();
+                if (detectCycleInComponent(graph, start, component)) {
+                    hasGraph = true;
+                } else {
+                    hasTree = true;
+                }
+            }
+            
+            if (hasTree && hasGraph) {
+                return TopologyType.HYBRID;
+            } else if (hasTree) {
+                return TopologyType.FOREST;
+            } else {
+                return TopologyType.DISCONNECTED_GRAPH;
+            }
+        }
+    }
+    
+    private static void dfsExplore(Integer vertex, HashMap<Integer, ArrayList<Integer>> graph, 
+                                   HashSet<Integer> visited, HashSet<Integer> component) {
+        visited.add(vertex);
+        component.add(vertex);
+        
+        if (graph.containsKey(vertex)) {
+            for (Integer neighbor : graph.get(vertex)) {
+                if (!visited.contains(neighbor)) {
+                    dfsExplore(neighbor, graph, visited, component);
+                }
+            }
+        }
+    }
+    
+    private static boolean detectCycle(HashMap<Integer, ArrayList<Integer>> graph, Integer start) {
+        HashSet<Integer> visited = new HashSet<>();
+        return dfsCheckCycle(start, null, graph, visited);
+    }
+    
+    private static boolean dfsCheckCycle(Integer vertex, Integer parent, 
+                                         HashMap<Integer, ArrayList<Integer>> graph, 
+                                         HashSet<Integer> visited) {
+        visited.add(vertex);
+        
+        if (graph.containsKey(vertex)) {
+            for (Integer neighbor : graph.get(vertex)) {
+                if (!visited.contains(neighbor)) {
+                    if (dfsCheckCycle(neighbor, vertex, graph, visited)) {
+                        return true;
+                    }
+                } else if (parent == null || !neighbor.equals(parent)) {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    }
+    
+    private static boolean detectCycleInComponent(HashMap<Integer, ArrayList<Integer>> graph, 
+                                                  Integer start, HashSet<Integer> component) {
+        HashSet<Integer> visited = new HashSet<>();
+        return dfsCheckCycleInComponent(start, null, graph, visited, component);
+    }
+    
+    private static boolean dfsCheckCycleInComponent(Integer vertex, Integer parent, 
+                                                    HashMap<Integer, ArrayList<Integer>> graph, 
+                                                    HashSet<Integer> visited, 
+                                                    HashSet<Integer> component) {
+        visited.add(vertex);
+        
+        if (graph.containsKey(vertex)) {
+            for (Integer neighbor : graph.get(vertex)) {
+                if (!component.contains(neighbor)) {
+                    continue;
+                }
+                if (!visited.contains(neighbor)) {
+                    if (dfsCheckCycleInComponent(neighbor, vertex, graph, visited, component)) {
+                        return true;
+                    }
+                } else if (parent == null || !neighbor.equals(parent)) {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
     }
  
     /**
