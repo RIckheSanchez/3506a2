@@ -179,7 +179,7 @@ public class OrderedMap<K extends Comparable<K>, V> implements MapInterface<K, V
     /** Returns a SORTED list of keys in the range [lo, hi]*/
     public List<K> keysInRange(K lo, K hi) {
         ArrayList<K> result = new ArrayList<>();
-        // Implement me!
+        keysInRangeHelper(root, lo, hi, result);
         return result;
     }
 
@@ -241,10 +241,13 @@ public class OrderedMap<K extends Comparable<K>, V> implements MapInterface<K, V
 
     /** The mirror of the rotateRight shown above */
     private Node<K, V> rotateLeft(Node<K, V> x) {
-        // uh oh... implement me!
-        // you can do it without AI, I believe in you
-        // make Barry proud
-        return x; // This will NOT work
+        Node<K, V> y = x.getRight();
+        Node<K, V> heavySubtree = y.getLeft();
+        y.setLeft(x);
+        x.setRight(heavySubtree);
+        updateHeight(x);
+        updateHeight(y);
+        return y;
     }
 
     /** Does the heavy lifting of the balancing */
@@ -361,5 +364,22 @@ public class OrderedMap<K extends Comparable<K>, V> implements MapInterface<K, V
 
     // you probably need more helpers here
 
+    private void keysInRangeHelper(Node<K, V> node, K lo, K hi, List<K> result) {
+        if (node == null) {
+            return;
+        }
+        int cmpLo = node.getKey().compareTo(lo);
+        int cmpHi = node.getKey().compareTo(hi);
+        
+        if (cmpLo > 0) {
+            keysInRangeHelper(node.getLeft(), lo, hi, result);
+        }
+        if (cmpLo >= 0 && cmpHi <= 0) {
+            result.add(node.getKey());
+        }
+        if (cmpHi < 0) {
+            keysInRangeHelper(node.getRight(), lo, hi, result);
+        }
+    }
 
 }
