@@ -99,14 +99,6 @@ public class Edge<S, U> {
 
         return dataEquals && verticesEqual;
     }
-
-    @Override
-    public String toString() {
-        return "Edge{" +
-               "vertex1=" + vertex1 +
-               ", vertex2=" + vertex2 +
-               ", data=" + data +
-               '}';
-    }
-
+//check
+  
 }
