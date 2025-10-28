@@ -66,7 +66,7 @@ Main Challenges I Encountered:
 How AI Helped Me:
 - For cycle detection in undirected graphs, AI explained why I need to track the parent node to avoid misclassifying reverse edges as cycles
 - For HYBRID type, AI helped me understand that I need to check if different components have different cycle properties (some with cycles, some without)
-- AI suggested using HashMap to store graph structure and HashSet to track visited states, though not the most efficient but easy to understand
+- AI suggested using hash map data structure to store graph structure and hash set to track visited states, which I implemented using my own UnorderedMap and SimpleSet classes (since HashMap and HashSet are prohibited in the assignment)
 
 My Learning Process:
 - Basic DFS traversal and graph representation were all implemented by myself

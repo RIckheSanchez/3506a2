@@ -8,12 +8,12 @@ import uq.comp3506.a2.structures.Vertex;
 import uq.comp3506.a2.structures.Entry;
 import uq.comp3506.a2.structures.TopologyType;
 import uq.comp3506.a2.structures.Tunnel;
+import uq.comp3506.a2.structures.UnorderedMap;
+import uq.comp3506.a2.structures.SimpleSet;
+import uq.comp3506.a2.structures.Heap;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.PriorityQueue;
 
 // This is part of COMP3506 Assignment 2. Students must implement their own solutions.
 
@@ -97,8 +97,8 @@ public class Problems {
             return TopologyType.UNKNOWN;
         }
         
-        HashMap<Integer, ArrayList<Integer>> graph = new HashMap<>();
-        HashSet<Integer> vertices = new HashSet<>();
+        UnorderedMap<Integer, ArrayList<Integer>> graph = new UnorderedMap<>();
+        SimpleSet<Integer> vertices = new SimpleSet<>();
         
         for (Edge<S, U> edge : edgeList) {
             int v1 = edge.getVertex1().getId();
@@ -106,18 +106,36 @@ public class Problems {
             vertices.add(v1);
             vertices.add(v2);
             
-            graph.putIfAbsent(v1, new ArrayList<>());
-            graph.putIfAbsent(v2, new ArrayList<>());
+            if (graph.get(v1) == null) {
+                graph.put(v1, new ArrayList<>());
+            }
+            if (graph.get(v2) == null) {
+                graph.put(v2, new ArrayList<>());
+            }
             graph.get(v1).add(v2);
             graph.get(v2).add(v1);
         }
         
-        HashSet<Integer> visited = new HashSet<>();
-        ArrayList<HashSet<Integer>> components = new ArrayList<>();
+        SimpleSet<Integer> visited = new SimpleSet<>();
+        ArrayList<SimpleSet<Integer>> components = new ArrayList<>();
+        ArrayList<Integer> vertexList = new ArrayList<>();
         
-        for (Integer vertex : vertices) {
+        // Convert vertices to list for iteration
+        for (Edge<S, U> edge : edgeList) {
+            int v1 = edge.getVertex1().getId();
+            int v2 = edge.getVertex2().getId();
+            if (!visited.contains(v1)) {
+                vertexList.add(v1);
+            }
+            if (!visited.contains(v2)) {
+                vertexList.add(v2);
+            }
+        }
+        visited.clear();
+        
+        for (Integer vertex : vertexList) {
             if (!visited.contains(vertex)) {
-                HashSet<Integer> component = new HashSet<>();
+                SimpleSet<Integer> component = new SimpleSet<>();
                 dfsExplore(vertex, graph, visited, component);
                 components.add(component);
             }
@@ -126,15 +144,24 @@ public class Problems {
         boolean isConnected = components.size() == 1;
         
         if (isConnected) {
-            boolean hasCycle = detectCycle(graph, vertices.iterator().next());
+            // Get first vertex from vertexList
+            Integer firstVertex = vertexList.get(0);
+            boolean hasCycle = detectCycle(graph, firstVertex);
             return hasCycle ? TopologyType.CONNECTED_GRAPH : TopologyType.CONNECTED_TREE;
         } else {
             boolean hasTree = false;
             boolean hasGraph = false;
             
-            for (HashSet<Integer> component : components) {
-                Integer start = component.iterator().next();
-                if (detectCycleInComponent(graph, start, component)) {
+            for (SimpleSet<Integer> component : components) {
+                // Get first element from component by finding it in vertexList
+                Integer start = null;
+                for (Integer v : vertexList) {
+                    if (component.contains(v)) {
+                        start = v;
+                        break;
+                    }
+                }
+                if (start != null && detectCycleInComponent(graph, start, component)) {
                     hasGraph = true;
                 } else {
                     hasTree = true;
@@ -151,12 +178,12 @@ public class Problems {
         }
     }
     
-    private static void dfsExplore(Integer vertex, HashMap<Integer, ArrayList<Integer>> graph, 
-                                   HashSet<Integer> visited, HashSet<Integer> component) {
+    private static void dfsExplore(Integer vertex, UnorderedMap<Integer, ArrayList<Integer>> graph, 
+                                   SimpleSet<Integer> visited, SimpleSet<Integer> component) {
         visited.add(vertex);
         component.add(vertex);
         
-        if (graph.containsKey(vertex)) {
+        if (graph.get(vertex) != null) {
             for (Integer neighbor : graph.get(vertex)) {
                 if (!visited.contains(neighbor)) {
                     dfsExplore(neighbor, graph, visited, component);
@@ -165,17 +192,17 @@ public class Problems {
         }
     }
     
-    private static boolean detectCycle(HashMap<Integer, ArrayList<Integer>> graph, Integer start) {
-        HashSet<Integer> visited = new HashSet<>();
+    private static boolean detectCycle(UnorderedMap<Integer, ArrayList<Integer>> graph, Integer start) {
+        SimpleSet<Integer> visited = new SimpleSet<>();
         return dfsCheckCycle(start, null, graph, visited);
     }
     
     private static boolean dfsCheckCycle(Integer vertex, Integer parent, 
-                                         HashMap<Integer, ArrayList<Integer>> graph, 
-                                         HashSet<Integer> visited) {
+                                         UnorderedMap<Integer, ArrayList<Integer>> graph, 
+                                         SimpleSet<Integer> visited) {
         visited.add(vertex);
         
-        if (graph.containsKey(vertex)) {
+        if (graph.get(vertex) != null) {
             for (Integer neighbor : graph.get(vertex)) {
                 if (!visited.contains(neighbor)) {
                     if (dfsCheckCycle(neighbor, vertex, graph, visited)) {
@@ -190,19 +217,19 @@ public class Problems {
         return false;
     }
     
-    private static boolean detectCycleInComponent(HashMap<Integer, ArrayList<Integer>> graph, 
-                                                  Integer start, HashSet<Integer> component) {
-        HashSet<Integer> visited = new HashSet<>();
+    private static boolean detectCycleInComponent(UnorderedMap<Integer, ArrayList<Integer>> graph, 
+                                                  Integer start, SimpleSet<Integer> component) {
+        SimpleSet<Integer> visited = new SimpleSet<>();
         return dfsCheckCycleInComponent(start, null, graph, visited, component);
     }
     
     private static boolean dfsCheckCycleInComponent(Integer vertex, Integer parent, 
-                                                    HashMap<Integer, ArrayList<Integer>> graph, 
-                                                    HashSet<Integer> visited, 
-                                                    HashSet<Integer> component) {
+                                                    UnorderedMap<Integer, ArrayList<Integer>> graph, 
+                                                    SimpleSet<Integer> visited, 
+                                                    SimpleSet<Integer> component) {
         visited.add(vertex);
         
-        if (graph.containsKey(vertex)) {
+        if (graph.get(vertex) != null) {
             for (Integer neighbor : graph.get(vertex)) {
                 if (!component.contains(neighbor)) {
                     continue;
@@ -244,32 +271,37 @@ public class Problems {
         
         int originId = origin.getId();
         
-        HashMap<Integer, ArrayList<EdgeInfo>> graph = new HashMap<>();
+        UnorderedMap<Integer, ArrayList<EdgeInfo>> graph = new UnorderedMap<>();
         
         for (Edge<S, U> edge : edgeList) {
             int v1 = edge.getVertex1().getId();
             int v2 = edge.getVertex2().getId();
             int weight = (Integer) edge.getData();
             
-            graph.putIfAbsent(v1, new ArrayList<>());
-            graph.putIfAbsent(v2, new ArrayList<>());
+            if (graph.get(v1) == null) {
+                graph.put(v1, new ArrayList<>());
+            }
+            if (graph.get(v2) == null) {
+                graph.put(v2, new ArrayList<>());
+            }
             
             graph.get(v1).add(new EdgeInfo(v2, weight));
             graph.get(v2).add(new EdgeInfo(v1, weight));
         }
         
-        HashMap<Integer, Integer> distances = new HashMap<>();
+        UnorderedMap<Integer, Integer> distances = new UnorderedMap<>();
         distances.put(originId, 0);
         
-        PriorityQueue<NodeDist> pq = new PriorityQueue<>((a, b) -> Integer.compare(a.dist, b.dist));
-        pq.offer(new NodeDist(originId, 0));
+        Heap<Integer, NodeDist> pq = new Heap<>();
+        pq.insert(0, new NodeDist(originId, 0));
         
-        HashSet<Integer> visited = new HashSet<>();
+        SimpleSet<Integer> visited = new SimpleSet<>();
         
         while (!pq.isEmpty()) {
-            NodeDist current = pq.poll();
-            int nodeId = current.nodeId;
-            int dist = current.dist;
+            Entry<Integer, NodeDist> current = pq.removeMin();
+            NodeDist nodeDist = current.getValue();
+            int nodeId = nodeDist.nodeId;
+            int dist = nodeDist.dist;
             
             if (visited.contains(nodeId)) {
                 continue;
@@ -281,7 +313,7 @@ public class Problems {
                 continue;
             }
             
-            if (!graph.containsKey(nodeId)) {
+            if (graph.get(nodeId) == null) {
                 continue;
             }
             
@@ -291,16 +323,33 @@ public class Problems {
                 int newDist = dist + edgeWeight;
                 
                 if (newDist <= threshold) {
-                    if (!distances.containsKey(neighborId) || newDist < distances.get(neighborId)) {
+                    if (distances.get(neighborId) == null || newDist < distances.get(neighborId)) {
                         distances.put(neighborId, newDist);
-                        pq.offer(new NodeDist(neighborId, newDist));
+                        pq.insert(newDist, new NodeDist(neighborId, newDist));
                     }
                 }
             }
         }
         
-        for (HashMap.Entry<Integer, Integer> entry : distances.entrySet()) {
-            answers.add(new Entry<>(entry.getKey(), entry.getValue()));
+        // Convert distances map to list of entries
+        // We need to iterate through all vertices we've seen
+        ArrayList<Integer> allVertices = new ArrayList<>();
+        for (Edge<S, U> edge : edgeList) {
+            int v1 = edge.getVertex1().getId();
+            int v2 = edge.getVertex2().getId();
+            if (distances.get(v1) != null && !allVertices.contains(v1)) {
+                allVertices.add(v1);
+            }
+            if (distances.get(v2) != null && !allVertices.contains(v2)) {
+                allVertices.add(v2);
+            }
+        }
+        
+        for (Integer vertexId : allVertices) {
+            Integer distance = distances.get(vertexId);
+            if (distance != null) {
+                answers.add(new Entry<>(vertexId, distance));
+            }
         }
         
         return answers;
@@ -397,10 +446,12 @@ public class Problems {
             return 0;
         }
         
-        HashSet<Integer> infiltrated = new HashSet<>();
+        SimpleSet<Integer> infiltrated = new SimpleSet<>();
         
         if (startingSites != null) {
-            infiltrated.addAll(startingSites);
+            for (Integer site : startingSites) {
+                infiltrated.add(site);
+            }
         }
         
         for (Integer site : sites) {
@@ -434,3 +485,4 @@ public class Problems {
         return sites.size() - infiltrated.size();
     }
 }
+
