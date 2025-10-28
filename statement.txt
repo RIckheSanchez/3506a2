@@ -1,4 +1,4 @@
-Submission counter: 0 << Keep track of your submission counts
+Submission counter: 9 << Keep track of your submission counts
 
 Student ID:49174058
 
@@ -66,7 +66,7 @@ Main Challenges I Encountered:
 How AI Helped Me:
 - For cycle detection in undirected graphs, AI explained why I need to track the parent node to avoid misclassifying reverse edges as cycles
 - For HYBRID type, AI helped me understand that I need to check if different components have different cycle properties (some with cycles, some without)
-- AI suggested using hash map data structure to store graph structure and hash set to track visited states, which I implemented using my own UnorderedMap and SimpleSet classes (since HashMap and HashSet are prohibited in the assignment)
+- AI suggested using hash map data structure to store graph structure and set to track visited states, which I implemented using my own UnorderedMap class and ArrayList for sets (since HashMap and HashSet are prohibited in the assignment)
 
 My Learning Process:
 - Basic DFS traversal and graph representation were all implemented by myself
@@ -167,11 +167,11 @@ This problem was more like applying an advanced algorithm pattern (binary search
 When implementing the routeManagement method, I encountered many problems with implementing Dijkstra's algorithm correctly and handling the threshold constraints, so I used AI tools to help me validate my implementation.
 
 Specific Prompt Examples:
-- I told AI that I didn't know how to represent the graph efficiently, and AI responded that I should build an adjacency list using HashMap to store neighbors and edge weights.
-- I told AI that my shortest path wasn't always correct, and AI reminded me that I should use a PriorityQueue (min-heap) to always process the closest unvisited node first.
+- I told AI that I didn't know how to represent the graph efficiently, and AI responded that I should build an adjacency list using a hash map to store neighbors and edge weights, which I implemented using my own UnorderedMap class (since HashMap is prohibited).
+- I told AI that my shortest path wasn't always correct, and AI reminded me that I should use a min-heap to always process the closest unvisited node first, which I implemented using my own Heap class (since PriorityQueue is prohibited).
 - I told AI that I was confused about when to mark nodes as visited, and AI explained that I should mark them when dequeuing, not when enqueuing, to ensure we process the shortest distance first.
-- I told AI that my algorithm was processing the same node multiple times, and AI suggested this is actually normal in Dijkstra - the priority queue might have duplicates but visited set prevents reprocessing.
-- I told AI that I wasn't sure how to handle the threshold constraint, and AI explained that I should only add nodes to the queue if their distance is within the threshold.
+- I told AI that my algorithm was processing the same node multiple times, and AI suggested this is actually normal in Dijkstra - the heap might have duplicates but visited set prevents reprocessing.
+- I told AI that I wasn't sure how to handle the threshold constraint, and AI explained that I should only add nodes to the heap if their distance is within the threshold.
 
 My Learning Process:
 - All code was written by myself, from understanding Dijkstra's algorithm to implementing the graph representation and shortest path calculation
@@ -181,17 +181,19 @@ My Learning Process:
 
 How AI Helped Me:
 - After I wrote the code, some logic errors weren't obvious, and AI helped analyze potential problem areas
-- With the visited checking, I initially marked nodes as visited when adding to queue, and AI reminded me this could miss shorter paths found later
+- With the visited checking, I initially marked nodes as visited when adding to heap, and AI reminded me this could miss shorter paths found later
 - I easily missed some edge cases, such as when the start vertex itself is the destination, and AI suggested I test these situations more thoroughly
 - Sometimes I couldn't decide between different data structures, and AI gave me some comparisons, but the specific implementation was still written by myself
+- AI also helped me understand that I needed to use my own UnorderedMap, SimpleSet, and Heap implementations instead of the prohibited Java collection classes
 
 Specific Examples:
 - My distance relaxation initially didn't check the threshold, and AI reminded me to filter nodes that exceed the distance limit
 - In building the adjacency list, I initially didn't handle vertices with no outgoing edges properly, and AI helped me clarify that I should still include them in the map
 - When collecting results, AI suggested I should only include vertices that were actually reached (exist in the distances map)
+- AI reminded me that I needed to replace prohibited classes (HashMap, HashSet, PriorityQueue) with my own implementations (UnorderedMap, SimpleSet, Heap), which I then implemented myself
 
 Important Note:
-I want to emphasize that I did NOT copy any code from AI. AI only helped me understand Dijkstra's algorithm concepts and clarified when to mark nodes as visited. The actual implementation including the adjacency list construction, the NodeDist and EdgeInfo helper classes, the priority queue logic, and the threshold filtering were all coded by myself. The main algorithm structure and all implementation decisions were my own work. AI just provided guidance on algorithmic concepts.
+I want to emphasize that I did NOT copy any code from AI. AI only helped me understand Dijkstra's algorithm concepts and clarified when to mark nodes as visited. The actual implementation including the adjacency list construction using UnorderedMap, the NodeDist and EdgeInfo helper classes, the Heap-based priority queue logic, and the threshold filtering were all coded by myself. I also implemented the SimpleSet class myself to replace HashSet. The main algorithm structure and all implementation decisions were my own work. AI just provided guidance on algorithmic concepts and reminded me about assignment restrictions.
 
 Summary:
 AI was like an experienced classmate giving me advice, but all code implementation, problem-solving, and learning processes were completed by myself. The core Dijkstra's algorithm implementation and all data structure choices were all my own work - AI only helped explain concepts and validate my approach. It just helped me discover some details I might have overlooked, allowing me to find problems faster.
