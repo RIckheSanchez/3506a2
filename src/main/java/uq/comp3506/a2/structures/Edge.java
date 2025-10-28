@@ -99,6 +99,6 @@ public class Edge<S, U> {
 
         return dataEquals && verticesEqual;
     }
-//check
+
   
 }
