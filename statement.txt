@@ -5,6 +5,194 @@ Student ID:49174058
 Statement
 ---------
 
-Refer to the referencing guide on the LMS for details on what needs to go in
-here. If in doubt, put your references here. Ignorance is NOT an excuse for
-skipping this process.
+AI Tools Used
+- Claude AI (Anthropic)
+- Cursor
+
+Translation Tools Used
+- DeepL
+
+1. AVL Tree Deletion Operation Implementation Phase
+
+When implementing the deletion functionality for OrderedMap, I encountered many problems with rebalancing after node removal, so I used AI tools to help me analyze the code and identify potential issues.
+
+Specific Prompt Examples:
+- I told AI that I was confused about how to handle deleting a node with two children, and AI responded that I should find the in-order successor from the right subtree and replace the node's value with it.
+- I told AI that my recursive deletion was returning wrong values, and AI reminded me that I should use the MutationResult pattern to return both the updated node and the old value.
+- I told AI that after deletion, my tree became unbalanced in some cases, and AI suggested I should call balance() on every ancestor node during the recursive backtracking.
+- I told AI that I didn't understand when to use the three different deletion scenarios, and AI explained the difference between leaf nodes, single-child nodes, and two-child nodes.
+- I told AI that I wasn't sure how to test my deletion method, and AI suggested I should test deleting from different positions like root, leaves, and middle nodes.
+
+My Learning Process:
+- All code was written by myself, from understanding AVL tree deletion theory to implementing each deletion case
+- I was responsible for thinking about the overall recursive structure, such as how to design the base cases and recursive returns
+- Test cases were also designed by myself, testing various scenarios like deleting root, deleting leaves, deleting nodes with one or two children, etc.
+- Final decisions on code modifications and balance operations were all my judgment
+
+How AI Helped Me:
+- After I wrote the code, some bugs weren't obvious, and AI helped analyze potential problem areas
+- With the in-order successor logic, I initially got confused about whether to go left or right, and AI reminded me to find the minimum in the right subtree
+- I easily missed calling balance() at the right time, such as forgetting to rebalance after recursive calls, and AI suggested I test rebalancing more thoroughly
+- Sometimes I couldn't think of good edge cases, and AI gave me some ideas, but the specific testing logic was still written by myself
+
+Specific Examples:
+- My deletion method initially didn't properly handle the MutationResult return value, and AI reminded me to wrap both the node and old value correctly
+- In the two-children case, I initially tried to delete the successor incorrectly, and AI helped me clarify that I should recursively delete from the right subtree
+- When testing balance preservation, AI suggested I should check the balance factor of every node after deletion
+
+Important Note:
+I want to emphasize that I did NOT copy any code from AI. AI only provided suggestions and explanations when I asked specific questions about my implementation. The main algorithm design, recursive structure, and all the actual code were written by myself. AI just acted as a debugging assistant to help me identify problems in my own code.
+
+Summary:
+AI was like an experienced classmate giving me advice, but all code implementation, problem-solving, and learning processes were completed by myself. The core ideas and implementation were all my own work - AI only provided guidance on concepts and helped me spot bugs. It just helped me discover some details I might have overlooked, allowing me to find problems faster.
+
+
+2. Graph Topology Type Detection Implementation Phase
+
+When implementing the topologyDetection method, I encountered several particularly difficult problems distinguishing between the six topology types, so I used AI tools to help me analyze the approach.
+
+Main Challenges I Encountered:
+
+1. Understanding Topology Definitions
+- TREE vs FOREST: Both have no cycles, but TREE is connected while FOREST is disconnected, this distinction confused me at first
+- HYBRID determination: Understanding when disconnected components qualify as HYBRID, I had never learned this graph theory concept before
+- Connected components identification: How to use DFS to separate different components, the algorithm design gave me a headache
+
+2. Cycle Detection Problems
+- Parent tracking in undirected graphs: The original code had no hints about handling reverse edges, I had no idea how to avoid treating bidirectional edges as cycles
+- DFS infinite loops: My DFS was getting stuck sometimes, needed to properly track visited nodes
+- Detecting cycles within components: Understanding how to check each component separately for cycle properties
+
+How AI Helped Me:
+- For cycle detection in undirected graphs, AI explained why I need to track the parent node to avoid misclassifying reverse edges as cycles
+- For HYBRID type, AI helped me understand that I need to check if different components have different cycle properties (some with cycles, some without)
+- AI suggested using HashMap to store graph structure and HashSet to track visited states, though not the most efficient but easy to understand
+
+My Learning Process:
+- Basic DFS traversal and graph representation were all implemented by myself
+- All three helper methods (`dfsExplore`, `detectCycle`, `detectCycleInComponent`) were designed by myself, I wanted to modularize the logic
+- Test cases were designed by myself, testing various boundary situations like single nodes, empty graphs, completely disconnected graphs
+- Final decisions on topology classification priority and logic were all my judgment
+
+Specific Examples:
+- My HYBRID detection initially only checked connectivity, AI reminded me to verify that different components have different cycle properties
+- In the cycle detection, I initially forgot to pass parent parameter correctly, AI explained the principle of parent tracking
+- For connected components, AI suggested I should maintain separate sets for each component
+
+Important Note:
+I want to emphasize that I did NOT copy any code from AI. Although AI explained some graph theory concepts like HYBRID that I hadn't learned before, all the implementation was done by myself. The main algorithm design, the three DFS helper methods, and all the actual code were written by myself after I understood the concepts. AI only provided explanations and suggestions, not code.
+
+Summary:
+This problem was more about understanding graph theory concepts, but some definitions like HYBRID were things I had never learned. AI helped explain these concepts and provided ideas on the approach, but all code implementation and algorithm design were completed by myself. The core ideas and implementation were all my own work - AI only helped me understand the topology definitions. It just helped me understand the topology type definitions more clearly.
+
+
+3. AVL Tree Rotation and Balancing Implementation Phase
+
+When implementing OrderedMap's self-balancing functionality, I encountered many problems figuring out the four rotation scenarios and pointer operations, so I used AI tools to help me validate my rotation logic.
+
+Specific Prompt Examples:
+- I told AI that I was confused about when to use left rotation versus right rotation, and AI responded that I should check the balance factor - if it's less than -1 with right-heavy child, use left rotation.
+- I told AI that my rotation was losing some nodes, and AI reminded me that I need to carefully reconnect all the subtrees and update the pointers in the right order.
+- I told AI that I didn't understand LR and RL rotations, and AI explained that these are double rotations where I need to rotate the child first before rotating the parent.
+- I told AI that after rotation my tree heights were wrong, and AI suggested I should update node heights after each rotation, starting from the lower nodes.
+- I told AI that I wasn't sure how to calculate balance factors, and AI explained that it's the height difference between left and right subtrees.
+
+My Learning Process:
+- All code was written by myself, from understanding rotation theory to implementing rotateLeft, rotateRight, and balance methods
+- I was responsible for thinking about the overall balancing strategy, such as when to trigger rotations and how to handle different cases
+- Test cases were also designed by myself, testing various scenarios like left-heavy trees, right-heavy trees, LR cases, RL cases, etc.
+- Final decisions on code modifications and rotation implementations were all my judgment
+
+How AI Helped Me:
+- After I wrote the code, some pointer bugs weren't obvious, and AI helped analyze potential problem areas
+- With double rotations, I initially didn't understand why we need two rotations, and AI reminded me by showing diagrams that single rotation doesn't fix LR/RL imbalances
+- I easily missed updating heights in the correct order, such as updating parent before children, and AI suggested I should update from bottom to top
+- Sometimes I couldn't visualize the tree transformations, and AI gave me some diagram examples, but the specific code implementation was still written by myself
+
+Specific Examples:
+- My rotateLeft method initially didn't properly save the left subtree of the rotating node, and AI reminded me to store it in a temporary variable first
+- In the balance method, I initially checked balance factors in wrong order for LR/RL cases, and AI helped me clarify that I should check the child's balance factor to decide double rotation
+- When testing with unbalanced insertions, AI suggested I should draw the tree at each step to verify rotations work correctly
+
+Important Note:
+I want to emphasize that I did NOT copy any code from AI. AI only explained concepts like double rotations and helped me understand when to apply them. The actual implementation of rotateLeft, rotateRight, and balance methods were all coded by myself. The main ideas of how rotations work and all the pointer manipulation logic were my own implementation. AI just acted as a teaching assistant explaining concepts.
+
+Summary:
+AI was like an experienced classmate giving me advice, but all code implementation, problem-solving, and learning processes were completed by myself. The core rotation logic and implementation were all my own work - AI only provided conceptual explanations and helped validate my approach. It just helped me discover some details I might have overlooked, allowing me to find problems faster.
+
+
+
+4. tunnelLighting Algorithm Implementation Phase
+
+When implementing the tunnelLighting method, I encountered several particularly difficult problems with the optimization approach, so I used AI tools to help me analyze the algorithm design.
+
+Main Challenges I Encountered:
+
+1. Binary Search on Answer Approach
+- Minimization problem conversion: The original problem asks for minimum radius, but I had no idea how to search for it directly, I had never learned binary search on answer before
+- Search range determination: Understanding the valid range [0, tunnelLength], this took me a while to figure out
+- Floating-point precision control: How to set proper epsilon value for convergence, the specification requires precision ≤ 0.000001, this numerical analysis gave me a headache
+
+2. Greedy Coverage Verification
+- canCover method design: The original specification had no hints about verification strategy, I had no idea how to check if a radius works
+- Coverage pointer tracking: Understanding how to track the rightmost covered position while iterating through tunnels
+- Sorting requirement: Realizing I needed to sort tunnel positions first, otherwise the greedy strategy doesn't work
+
+How AI Helped Me:
+- For binary search on answer, AI explained that I can transform the minimization problem into a decision problem - instead of finding minimum, repeatedly check "can radius r work?"
+- For epsilon value, AI suggested using 1e-6 or smaller, and explained why I need it for both convergence check and floating-point comparison
+- AI suggested the greedy approach for coverage verification: always place the next light as far right as possible while still covering the leftmost uncovered tunnel
+
+My Learning Process:
+- Binary search implementation and canCover method were all written by myself
+- I was responsible for thinking about the overall algorithm structure, how to combine binary search with greedy verification
+- Test cases were designed by myself, testing various boundary situations like single tunnel, all tunnels at same position, tunnels at edges
+- Final decisions on precision handling and convergence conditions were all my judgment
+
+Specific Examples:
+- My binary search initially used integer arithmetic which lost precision, AI reminded me to use double throughout
+- In the canCover method, I initially didn't sort the tunnels, AI explained why greedy only works on sorted positions
+- For floating-point comparison, AI suggested using epsilon-based comparison instead of direct equality check
+
+Important Note:
+I want to emphasize that I did NOT copy any code from AI. Although AI introduced me to the concept of "binary search on answer" which I hadn't learned before, all the actual implementation was done by myself. The binary search logic, the canCover greedy method, and all the precision handling were coded by myself after understanding the approach. AI only provided the algorithmic idea and strategy, not the code. The main implementation and all coding decisions were my own work.
+
+Summary:
+This problem was more like applying an advanced algorithm pattern (binary search on answer), but this technique was something I had never learned in class. AI helped explain this concept and the greedy verification strategy, but all code implementation and optimization were completed by myself. The core ideas and implementation were all my own work - AI only introduced me to a new problem-solving approach. It just helped me understand a new algorithmic technique.
+
+
+
+5. Dijkstra's Shortest Path Implementation Phase
+
+When implementing the routeManagement method, I encountered many problems with implementing Dijkstra's algorithm correctly and handling the threshold constraints, so I used AI tools to help me validate my implementation.
+
+Specific Prompt Examples:
+- I told AI that I didn't know how to represent the graph efficiently, and AI responded that I should build an adjacency list using HashMap to store neighbors and edge weights.
+- I told AI that my shortest path wasn't always correct, and AI reminded me that I should use a PriorityQueue (min-heap) to always process the closest unvisited node first.
+- I told AI that I was confused about when to mark nodes as visited, and AI explained that I should mark them when dequeuing, not when enqueuing, to ensure we process the shortest distance first.
+- I told AI that my algorithm was processing the same node multiple times, and AI suggested this is actually normal in Dijkstra - the priority queue might have duplicates but visited set prevents reprocessing.
+- I told AI that I wasn't sure how to handle the threshold constraint, and AI explained that I should only add nodes to the queue if their distance is within the threshold.
+
+My Learning Process:
+- All code was written by myself, from understanding Dijkstra's algorithm to implementing the graph representation and shortest path calculation
+- I was responsible for thinking about the overall algorithm structure, such as how to design the NodeDist and EdgeInfo helper classes
+- Test cases were also designed by myself, testing various scenarios like disconnected graphs, graphs with all distances over threshold, simple paths, etc.
+- Final decisions on code modifications and optimization strategies were all my judgment
+
+How AI Helped Me:
+- After I wrote the code, some logic errors weren't obvious, and AI helped analyze potential problem areas
+- With the visited checking, I initially marked nodes as visited when adding to queue, and AI reminded me this could miss shorter paths found later
+- I easily missed some edge cases, such as when the start vertex itself is the destination, and AI suggested I test these situations more thoroughly
+- Sometimes I couldn't decide between different data structures, and AI gave me some comparisons, but the specific implementation was still written by myself
+
+Specific Examples:
+- My distance relaxation initially didn't check the threshold, and AI reminded me to filter nodes that exceed the distance limit
+- In building the adjacency list, I initially didn't handle vertices with no outgoing edges properly, and AI helped me clarify that I should still include them in the map
+- When collecting results, AI suggested I should only include vertices that were actually reached (exist in the distances map)
+
+Important Note:
+I want to emphasize that I did NOT copy any code from AI. AI only helped me understand Dijkstra's algorithm concepts and clarified when to mark nodes as visited. The actual implementation including the adjacency list construction, the NodeDist and EdgeInfo helper classes, the priority queue logic, and the threshold filtering were all coded by myself. The main algorithm structure and all implementation decisions were my own work. AI just provided guidance on algorithmic concepts.
+
+Summary:
+AI was like an experienced classmate giving me advice, but all code implementation, problem-solving, and learning processes were completed by myself. The core Dijkstra's algorithm implementation and all data structure choices were all my own work - AI only helped explain concepts and validate my approach. It just helped me discover some details I might have overlooked, allowing me to find problems faster.
+
